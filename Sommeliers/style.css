@@ -1,0 +1,130 @@
+@font-face { font-family: "Inter-Light"; src: url('Inter-Light.ttf'); }
+#profileContainer{
+    display:flex;
+    background-color: #8B0000;
+    padding: 10px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+#formContainer{
+    display: flex;
+    padding:15px;
+    border:solid;
+    border-width: 3px;
+    border-radius: 20px;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    font-family: "Inter-Light";
+    font-weight: bold;
+    font-size: 2.5vh;
+    margin-top: 15px;
+    /*background-color: #F5DEB3;*/
+}
+#profileImage{
+    cursor: pointer;
+    border-radius: 50%;
+    object-fit: contain;
+}
+#profileContainer label{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#statusContainer{
+    display:none;
+    padding:3px;
+    padding-left: 5px;
+    margin-bottom: 10px;
+    position: relative;
+    border-left: solid;
+    border-width: 4px;
+    border-color: red;
+    transform-style: preserve-3d;
+    z-index: 1;
+    width:100%;
+}
+#profileLabel{
+    cursor: pointer;
+}
+#dataColumn{
+    width:100%;
+    margin-left: 10px;
+}
+#dataColumn .row{
+    align-items: center;
+}
+#statusContainer::after{
+    content: "";
+    position: absolute;
+    height: 100%;
+    top:0;
+    left: 0;
+    z-index: -1;
+    transition: 3s linear;
+}
+input[type="text"]{
+    width:100%;
+}
+#statusText{
+    z-index: 2;
+}
+#popis{
+    width:100%;
+    margin-left: 5px;
+}
+#addSommelier{
+    width: 50%;
+    margin-top: 10px;
+    padding:7px;
+    background-color: #8B0000;
+    color: #EAEAEA;
+    border: none;
+    border-radius: 10px;
+    font-size: 3vh;
+    font-family: "Inter-Light";
+}
+.column label{
+    width: 15%;
+    text-align: right;
+    margin-right: 7px;
+}
+.column{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.row{
+    display: flex;
+    flex-direction: row;
+    width:100%;
+}
+.statusErrorFull::after{
+    width:100%;
+    background-color: #FFC0CB;
+}
+.statusError::after{
+    width:0%;
+    background-color: #FFC0CB;
+}
+.statusSuccessFull::after{
+    width: 100%;
+    background-color: #afd392;
+}
+.statusSuccess::after{
+    width: 0%;
+    background-color: #afd392;
+}
+
+@media only screen and (max-width: 768px) {
+    /* For mobile phones: */
+    #dataColumn{
+        margin-left: 5px;
+    }
+    .column label{
+        width: 25%;
+        text-align: right;
+        margin-right: 7px;
+    }
+  }
