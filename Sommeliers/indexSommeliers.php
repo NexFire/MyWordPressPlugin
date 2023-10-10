@@ -21,11 +21,6 @@ function loadForm(){
     wp_localize_script('your-plugin-script', 'dataObject', array(
         'nonce' => $nonce,
     ));
-    //$html_string=file_get_contents(plugin_dir_path(__FILE__) . 'load.php');
-    //echo plugins_url('addSommelier.php', __FILE__);
-    //$html_string=str_replace("{\SommelierAction\}",plugins_url('handelingForm.php', __FILE__),$html_string,$fuck);
-    //print_r($fuck);
-    //echo gettype($html_string);
     include "header.php";
 }
 function loadDashBoardTab(){
@@ -40,7 +35,6 @@ function loadDashBoardTab(){
         $icon_data_uri
     );
 }
-//add_shortcode("getSommeliers","loadForm");
 add_action("admin_menu","loadDashBoardTab");
 function enqueue_jquery() {
     wp_enqueue_script('jquery');
@@ -61,7 +55,6 @@ function save_arraybuffer_callback() {
 
     // Get the ArrayBuffer from the AJAX request
     if (isset($_FILES['file'])) {
-        error_log(print_r("Mame buffer",TRUE));
         foreach ($_FILES as $key => $value) {
             error_log( print_r("Key: $key, Value: $value",TRUE));
         }
@@ -101,14 +94,4 @@ function save_arraybuffer_callback() {
 
 add_action('wp_ajax_save_arraybuffer', 'save_arraybuffer_callback');
 add_action('wp_ajax_nopriv_save_arraybuffer', 'save_arraybuffer_callback');
-
-/*
-function custom_allow_file_upload_types($mime_types) {
-    $mime_types['png'] = 'image/png';
-    $mime_types['jpg'] = 'image/jpeg';
-    $mime_types['jpeg'] = 'image/jpeg'; // Add the MIME type for .txt files
-    return $mime_types;
-}
-add_filter('upload_mimes', 'custom_allow_file_upload_types');
-*/
 ?>
