@@ -48,11 +48,6 @@ function enqueue_jquery() {
 add_action('wp_enqueue_scripts', 'enqueue_jquery');
 
 function save_arraybuffer_callback() {
-    // Verify the nonce for security (optional)
-    error_log(print_r("Ahojda tady jsme kundo",TRUE));
-    foreach ($_POST as $key => $value) {
-        error_log( print_r("Key: $key, Value: $value",TRUE));
-    }
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'save_arraybuffer_nonce')) {
         echo json_encode(array('success' => false, 'message' => 'Permission denied.'));
         die();
@@ -71,7 +66,6 @@ function save_arraybuffer_callback() {
             error_log( print_r("Key: $key, Value: $value",TRUE));
         }
         $fileReference = wp_handle_upload($_FILES['file'], array('test_form' => false));
-        error_log(print_r($fileReference,TRUE));
         if (!empty($fileReference['file'])) {
             $servername = "localhost";
             $username = "api";
