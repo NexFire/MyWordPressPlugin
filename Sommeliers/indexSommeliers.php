@@ -13,108 +13,140 @@ Author URI: https://github.com/NexFire
 */
 
 
-//form for [getSommeliers]
-function loadForm(){
-    wp_enqueue_style('custom-css', plugins_url('style.css', __FILE__));
-    wp_enqueue_script('your-plugin-script', plugins_url('script.js', __FILE__), array('jquery'), '1.0', true);
-    $nonce = wp_create_nonce('save_arraybuffer_nonce');
-    wp_localize_script('your-plugin-script', 'dataObject', array(
-        'nonce' => $nonce,
-    ));
-    //$html_string=file_get_contents(plugin_dir_path(__FILE__) . 'load.php');
-    //echo plugins_url('addSommelier.php', __FILE__);
-    //$html_string=str_replace("{\SommelierAction\}",plugins_url('handelingForm.php', __FILE__),$html_string,$fuck);
-    //print_r($fuck);
-    //echo gettype($html_string);
-    include "header.php";
-}
-function loadDashBoardTab(){
-    $icon_base64 = 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPgo8c3ZnIHdpZHRoPSI4MDBweCIgaGVpZ2h0PSI4MDBweCIgdmlld0JveD0iMCAwIDY0IDY0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBhcmlhLWhpZGRlbj0idHJ1ZSIgcm9sZT0iaW1nIiBjbGFzcz0iaWNvbmlmeSBpY29uaWZ5LS1lbW9qaW9uZSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgbWVldCI+PHBhdGggZD0iTTE1LjEgMjIuMUMxNiAzMC4xIDIzLjMgMzcgMzIgMzdjOS40IDAgMTcuMS04IDE3LjEtMTYuN3YtLjJjLTkuOC0xLjMtMjIuMSA1LjgtMzQgMiIgZmlsbD0iIzk2MTYyMyI+PC9wYXRoPjxwYXRoIGQ9Ik01NCAyMC40QzU0IDkgNDguMyAyIDQ4LjMgMkgxNS43UzEwIDkuMSAxMCAyMC40YzAgMTAuOCA5LjMgMjAuOSAyMC45IDIxLjVjLS4xIDYuMy0uNyAxMi44LTIuMiAxNS4xYy0yLjIgMy4yLTkuOCAxLjYtOS44IDVoMjYuMmMwLTMuNC03LjYtMS44LTkuOC01Yy0xLjUtMi4zLTIuMS04LjgtMi4yLTE1LjFDNDQuNyA0MS4zIDU0IDMxLjMgNTQgMjAuNE0zMiAzOS4zYy05LjggMC0xNy45LTcuOC0xOC45LTE2LjdjLS4xLS42LS4xLTEuMy0uMS0xLjljMC05LjkgNC45LTE1LjkgNC45LTE1LjloMjguMnM0LjggNiA0LjkgMTUuN3YuMmMwIDkuNi04LjUgMTguNi0xOSAxOC42IiBvcGFjaXR5PSIuOCIgZmlsbD0iI2ExYjhjNyI+PC9wYXRoPjwvc3ZnPg==';
-    $icon_data_uri = 'data:image/svg+xml;base64,' . $icon_base64;
-    add_menu_page(
-        "Sommeliers",
-        "Sommeliers",
-        "manage_options",
-        "add-sommelier",
-        "loadForm",
-        $icon_data_uri
-    );
-}
-//add_shortcode("getSommeliers","loadForm");
-add_action("admin_menu","loadDashBoardTab");
+add_action('wp_enqueue_scripts', 'enqueue_jquery');
 function enqueue_jquery() {
     wp_enqueue_script('jquery');
 }
 add_action('wp_enqueue_scripts', 'enqueue_jquery');
 
-function save_arraybuffer_callback() {
-    // Verify the nonce for security (optional)
-    error_log(print_r("Ahojda tady jsme kundo",TRUE));
-    foreach ($_POST as $key => $value) {
-        error_log( print_r("Key: $key, Value: $value",TRUE));
-    }
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'save_arraybuffer_nonce')) {
-        echo json_encode(array('success' => false, 'message' => 'Permission denied.'));
-        die();
-    }
 
-    // Initialize the WordPress filesystem
-    if (!function_exists('wp_filesystem')) {
-        require_once ABSPATH . '/wp-admin/includes/file.php';
-    }
-    WP_Filesystem();
-
-    // Get the ArrayBuffer from the AJAX request
-    if (isset($_FILES['file'])) {
-        error_log(print_r("Mame buffer",TRUE));
-        foreach ($_FILES as $key => $value) {
-            error_log( print_r("Key: $key, Value: $value",TRUE));
-        }
-        $fileReference = wp_handle_upload($_FILES['file'], array('test_form' => false));
-        error_log(print_r($fileReference,TRUE));
-        if (!empty($fileReference['file'])) {
-            $servername = "localhost";
-            $username = "api";
-            $password = "apipassword";
-            $databaseName="wordPressTest1";
-            $conn = mysqli_connect($servername, $username, $password,$databaseName);
-            if ($conn->connect_error) {
-                error_log(print_r("Fuck up here",TRUE));
-                $data=["status"=>500,"message"=>"No connection to database"];
-                echo json_encode($data);
-            }
-            else{
-                $sql="INSERT INTO Sommeliers (Jmeno,Email,Mobil,Popis,FotoUrl) VALUES ('".$_POST["name"]."','".$_POST["email"]."','".$_POST["mobil"]."','".$_POST["popis"]."','".$fileReference["url"]."')";
-                $result = mysqli_query($conn,$sql);
-                if($result){
-                    $data=["status"=>200,"message"=>"Data in the database"];
-                    echo json_encode($data);
-                }
-                else{
-                    $data=["status"=>500,"message"=>"Incorrect query"];
-                    echo json_encode($data);
-                }
-            }
-        } else {
-            echo json_encode(array('success' => false, 'message' => 'Failed to save the file.'));
-        }
-    } else {
-        echo json_encode(array('success' => false, 'message' => 'No ArrayBuffer data received.'));
-    }
-    // Always exit to avoid extra output
-    wp_die();
+function add_info_custom_generate( $post ) {
+    wp_enqueue_style('custom-css', plugins_url('style.css', __FILE__));
+    wp_nonce_field(basename(__FILE__), 'info_metabox_nonce');
+    $email=get_post_meta($post->ID,'email',true);
+    $phone=get_post_meta($post->ID,'phone',true);
+	?>
+    <div id="info_container">
+        <div class="infoRow">
+            <label for="email_field">Email:</label><br>
+            <input type="email" placeholder="jan.novak@seznam.cz" name="email" id="email" class="infoBox" value="<?php echo esc_attr($email) ?>" required>
+        </div>
+        <div class="infoRow">
+            <label for="phone_field">Telefon:</label>
+            <input type="tel" name="phone" id="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{3}" placeholder="+420-666-666-666" class="infoBox" value="<?php echo esc_attr($phone) ?>" required>
+        </div>
+    </div>
+	<?php
 }
 
-add_action('wp_ajax_save_arraybuffer', 'save_arraybuffer_callback');
-add_action('wp_ajax_nopriv_save_arraybuffer', 'save_arraybuffer_callback');
-
-/*
-function custom_allow_file_upload_types($mime_types) {
-    $mime_types['png'] = 'image/png';
-    $mime_types['jpg'] = 'image/jpeg';
-    $mime_types['jpeg'] = 'image/jpeg'; // Add the MIME type for .txt files
-    return $mime_types;
+function modify_sommeliers_api_response($response, $post, $request) {
+    $postId=$post->ID;
+    $response=array();
+    $response["jmeno"]=get_the_title($postId);
+    $response["email"]=get_post_meta($postId,'email',true);
+    $response["telefon"]=get_post_meta($postId,'phone',true);
+    $response["foto"]=get_the_post_thumbnail_url($postId);
+    return $response;
 }
-add_filter('upload_mimes', 'custom_allow_file_upload_types');
-*/
+
+add_filter('rest_prepare_sommeliers', 'modify_sommeliers_api_response', 10, 3);
+
+
+function add_custom_boxes(){
+    wp_enqueue_script('sommeliers-script', plugins_url('script.js', __FILE__), array('jquery'), '1.0', true);
+    add_meta_box(
+        'photo_custom_box',
+        'Informace',
+        'add_info_custom_generate',
+        'sommeliers',
+        'advanced',
+        'high'
+    );
+
+}
+add_action('add_meta_boxes','add_custom_boxes');
+
+function info_metabox_save($post_id) {
+    
+    // Verify post type
+    if (isset($_POST['post_type']) && $_POST['post_type'] != 'sommeliers') {
+        return $post_id;
+    }
+
+    $is_autosave = wp_is_post_autosave($post_id);
+    $is_revision = wp_is_post_revision($post_id);
+    $is_valid_nonce = (isset($_POST['my_custom_metabox_nonce']) && wp_verify_nonce($_POST['my_custom_metabox_nonce'], basename(__FILE__))) ? 'true' : 'false';
+
+    if ($is_autosave || $is_revision || !$is_valid_nonce) {
+        return;
+    }
+
+    // Check if our custom field has been set
+    if (isset($_POST['email']) && isset($_POST['phone'])) {
+        update_post_meta($post_id, 'email', sanitize_text_field($_POST['email']));
+        update_post_meta($post_id, 'phone', sanitize_text_field($_POST['phone']));
+    }
+
+}
+
+add_action('save_post', 'info_metabox_save');
+
+
+function hide_media_button_for_sommelier() {
+    $screen = get_current_screen();
+    if ( $screen->id == 'sommeliers' ) { // Change 'sommelier' to your custom post type's slug if different.
+        echo '<style>
+            .single .post-thumbnail{ display:none;}
+            .wp-media-buttons { display:none; }
+        </style>';
+    }
+}
+add_action( 'admin_head', 'hide_media_button_for_sommelier' );
+
+
+function sommelier_template($template) {
+    global $post;
+
+    if ($post->post_type == "sommeliers") {
+        $template = dirname(__FILE__) . '/sommelier-template.php';
+    }
+
+    return $template;
+}
+
+add_filter('template_include', 'sommelier_template');
+
+function disable_gutenberg_for_custom_type($use_block_editor, $post_type) {
+    if ($post_type === 'sommeliers') {
+        return false;  // Disable Gutenberg/block-editor for 'my_custom_type'
+    }
+    return $use_block_editor;
+}
+add_filter('use_block_editor_for_post_type', 'disable_gutenberg_for_custom_type', 10, 2);
+
+function sommeliers_custom_post_type() {
+	register_post_type('sommeliers',
+		array(
+			'labels'      => array(
+				'name'          => __('Sommeliers', 'textdomain'),
+				'singular_name' => __('Sommelier', 'textdomain'),
+                'add_new_item' => __('Add Sommelier',"textdomain"),
+                'add_new' => __('Add Sommelier',"textdomain")
+			),
+            'menu_icon'=>plugins_url('wineGlassIcon.svg', __FILE__),
+            'hierarchical'=>true,
+
+            'supports'            => array('title','editor','thumbnail'),
+            'public'      => true,
+            'show_in_rest' =>true,
+            'has_archive' => true,
+            'show_ui' => true,
+            'rewrite'     => array( 'slug' => 'sommeliers' )
+		)
+	);
+}
+add_action('init', 'sommeliers_custom_post_type');
+
+
+
 ?>
